@@ -3,13 +3,13 @@
 pragma solidity =0.7.6;
 pragma abicoder v2;
 
-import "../common/Agentable.sol";
+import "../common/OwnableUpgradeable.sol";
 import "../common/ReentrancyGuardUpgradeable.sol";
 import "../common/EnumerableSet.sol";
 import "../token/ERC20/IERC20.sol";
 import "../token/ERC721/ERC721.sol";
 
-contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
+contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 {
     using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -35,15 +35,13 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
      * @param nodeEntry Node  entry.
      * @param receiptAddr ESC address to receive tipping or other payments.
      * @param ownerAddr ESC address to make register transaction.
-     * @param agentAddr ESC address of agent, if none it can be 0.
      */
     event NodeRegistered(
         uint256 tokenId,
         string tokenURI,
         string nodeEntry,
         address receiptAddr,
-        address ownerAddr,
-        address agentAddr
+        address ownerAddr
     );
 
     /**
@@ -78,29 +76,12 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
         address platformAddress
     );
 
-    /**
-     * @dev MUST emit when a new agent is added.
-     * The `account` argument MUST be the updated account.
-     */
-    event AgentAdded(
-        address account
-    );
-
-    /**
-     * @dev MUST emit when a new agent is removed.
-     * The `account` argument MUST be the updated account.
-     */
-    event AgentRemoved(
-        address account
-    );
-
     struct Node {
         uint256 tokenId;
         string tokenURI;
         string nodeEntry;
         address receiptAddr;
         address ownerAddr;
-        address agentAddr;
         bool isRevealed;
     }
 
@@ -109,10 +90,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
     address private _platformAddr;
     mapping(uint256 => Node) private _allTokens;
     EnumerableSet.UintSet private _tokens;
-    mapping(address => EnumerableSet.UintSet) private _agentTokens;
-    // EnumerableSet.AddressSet private _agents;
-    address[] private _agents;
-    mapping(address => uint256) private agentToIndex; // agent => index of _agents
 
     /**
      * @notice Initialize a node registry contract with platform address info.
@@ -136,8 +113,8 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
      * @param mintFee amount of ERC20 token.
      */
      function mint(
-        uint256 tokenId,   //nodeId
-        string memory tokenURI,  //nodeURI
+        uint256 tokenId,   // nodeId
+        string memory tokenURI,  // nodeURI
         string memory nodeEntry,
         address quoteToken,
         uint256 mintFee
@@ -163,33 +140,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
         uint256 mintFee
     ) external payable nonReentrant {
         _mintByWallet(tokenId, tokenURI, nodeEntry, receiptAddr, quoteToken, mintFee);
-    }
-
-    /**
-     * @notice Register a new node by agent.
-     * @param tokenId Node unique Id.
-     * @param tokenURI Node uri.
-     * @param nodeEntry Node entry.
-     * @param receiptAddr ESC address to receive tipping or other payments.
-     * @param ownerAddr ESC address to make register transaction.
-     */
-    function mint(
-        uint256 tokenId,   //nodeId
-        string memory tokenURI,  //nodeURI
-        string memory nodeEntry,
-        address receiptAddr,
-        address ownerAddr
-    ) external onlyAgentOrOwner nonReentrant {
-        require(
-            receiptAddr != address(0),
-            "NodeRegistry: invalid receipt address"
-        );
-        require(
-            ownerAddr != address(0),
-            "NodeRegistry: invalid node owner address"
-        );
-
-        _mintNewnode(tokenId, tokenURI, nodeEntry, receiptAddr, ownerAddr, msg.sender);
     }
 
     /**
@@ -249,7 +199,7 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
                 quoteToken,
                 registerFee
             );
-        _mintNewnode(tokenId, tokenURI, nodeEntry, receiptAddr, msg.sender, address(0));
+        _mintNewNode(tokenId, tokenURI, nodeEntry, receiptAddr, msg.sender);
     }
 
     /**
@@ -259,15 +209,13 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
      * @param nodeEntry Node entry.
      * @param receiptAddr ESC address to receive tipping or other payments.
      * @param ownerAddr ESC address to make register transaction.
-     * @param agentAddr address of agent, if none it can be 0.
      */
-    function _mintNewnode(
+    function _mintNewNode(
         uint256 tokenId,
         string memory tokenURI,
         string memory nodeEntry,
         address receiptAddr,
-        address ownerAddr,
-        address agentAddr
+        address ownerAddr
     ) internal virtual {
         _mint(ownerAddr, tokenId);
         _setTokenURI(tokenId, tokenURI);
@@ -278,18 +226,12 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
         newNode.nodeEntry = nodeEntry;
         newNode.receiptAddr = receiptAddr;
         newNode.ownerAddr = ownerAddr;
-        newNode.agentAddr = agentAddr;
         newNode.isRevealed = false;
 
         _allTokens[tokenId] = newNode;
-        // registered nodes
         _tokens.add(tokenId);
-        // registered nodes by registerants.
-        if (agentAddr != address(0)) {
-            _agentTokens[agentAddr].add(tokenId);
-        }
 
-        emit NodeRegistered(tokenId, tokenURI, nodeEntry, receiptAddr, ownerAddr, agentAddr);
+        emit NodeRegistered(tokenId, tokenURI, nodeEntry, receiptAddr, ownerAddr);
     }
 
     /**
@@ -312,27 +254,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
     }
 
     /**
-     * @notice Unregister a node by agent.
-     * @param tokenId Node Id to be removed.
-     * @param ownerAddr address of node owner.
-     */
-    function burn(
-        uint256 tokenId,
-        address ownerAddr
-    ) external onlyAgentOrOwner nonReentrant {
-        require(
-            _exists(tokenId),
-            "NodeRegistry: invalid nodeId"
-        );
-        require(
-            ownerOf(tokenId) == ownerAddr,
-            "NodeRegistry: invalid node owner address"
-        );
-
-        _burn(tokenId);
-    }
-
-    /**
      * @notice Unregister a node.
      * @param tokenId Node Id to be removed.
      */
@@ -342,11 +263,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
         super._burn(tokenId);
         // registered nodes
         _tokens.remove(tokenId);
-        // agent nodes
-        address agentAddr = _allTokens[tokenId].agentAddr;
-        if (agentAddr != address(0)) {
-            _agentTokens[agentAddr].remove(tokenId);
-        }
         // Clear _allTokens
         if (_allTokens[tokenId].tokenId != 0) {
             delete _allTokens[tokenId];
@@ -361,7 +277,7 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
      * @param tokenURI Updated node uri.
      * @param receiptAddr updated ESC address to receive tipping.
      */
-    function updatenode(
+    function updateNode(
         uint256 tokenId,
         string memory tokenURI,
         address receiptAddr
@@ -375,31 +291,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
             "NodeRegistry: caller is not node owner"
         );
         // receipt Addr can be 0x0, which means no changes.
-        _updateNode(tokenId, tokenURI, receiptAddr);
-    }
-
-    /**
-     * @notice Update node by agent.
-     * @param tokenId Node Id to be updated.
-     * @param tokenURI Updated node uri.
-     * @param receiptAddr Updated ESC address to receive tipping.
-     * @param ownerAddr Address of node owner.
-     */
-    function updateNode(
-        uint256 tokenId,
-        string memory tokenURI,
-        address receiptAddr,
-        address ownerAddr
-    ) external onlyAgentOrOwner nonReentrant {
-        require(
-            _exists(tokenId),
-            "NodeRegistry: invalid nodeId"
-        );
-        require(
-            ownerOf(tokenId) == ownerAddr,
-            "NodeRegistry: invalid node owner address"
-        );
-
         _updateNode(tokenId, tokenURI, receiptAddr);
     }
 
@@ -530,78 +421,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
         address ownerAddr
     ) external view returns (bytes32[] memory) {
         return holderTokens(ownerAddr);
-    }
-
-    /**
-     * @notice Get count of nodes registered by given agent.
-     * @param agentAddr ESC address of agent.
-     * @return The count of nodes.
-     */
-    function agentNodeCount(
-        address agentAddr
-    ) public view returns (uint256) {
-        return _agentTokens[agentAddr].length();
-    }
-
-    /**
-     * @notice Get count of nodes by agent address
-     * @param agentAddr ESC address of agent.
-     * @param index Index of node.
-     * @return Node info.
-     */
-    function agentNodeByIndex(
-        address agentAddr,
-        uint256 index
-    ) external view returns (Node memory) {
-        uint256 tokenId = _agentTokens[agentAddr].at(index);
-        return _allTokens[tokenId];
-    }
-
-    /**
-     * @notice Get list of nodes by agent address
-     * @param agentAddr ESC address of agent.
-     * @return The list of node Ids.
-     */
-    function agentNodeIds(
-        address agentAddr
-    ) external view returns (bytes32[] memory) {
-        return _agentTokens[agentAddr].get();
-    }
-
-    /**
-     * @notice Set agent role.
-     */
-    function _setAgent(address _addr, bool _state) internal virtual override {
-        super._setAgent(_addr, _state);
-        if (_state) {
-            // _agents.add(_addr);
-            agentToIndex[_addr] = _agents.length;
-            _agents.push(_addr);
-            emit AgentAdded(_addr);
-        }
-        else {
-            // _agents.remove(_addr);
-            _agents[agentToIndex[_addr]] = _agents[_agents.length - 1];
-            agentToIndex[_agents[_agents.length - 1]] = agentToIndex[_addr];
-            _agents.pop();
-            emit AgentRemoved(_addr);
-        }
-    }
-
-    /**
-     * @notice Get count of agents.
-     * @return count the count of agent addresses.
-     */
-    function agentCount() external view returns (uint256) {
-        return _agents.length;
-    }
-
-    /**
-     * @notice Get list of agents.
-     * @return agents the list of agent addresses.
-     */
-    function agents() external view returns (address[] memory) {
-        return _agents;
     }
 
     /**
