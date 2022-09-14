@@ -45,9 +45,6 @@ interface INodeRegistry is IERC721 {
 
     function isValidNodeId(uint256 tokenId) external view returns (bool);
 
-    function setCategoryList(string memory categeoryURI) external;
-    function getCategoryList() external view returns (string memory);
-
     function setPlatformAddr(address platformAddr) external;
     function platformAddress() external view returns (address);
 
@@ -55,7 +52,6 @@ interface INodeRegistry is IERC721 {
     event NodeRegistered(uint256 tokenId, string tokenURI, string nodeEntry, address receiptAddr, address ownerAddr, address agentAddr);
     event NodeUnregistered(uint256 tokenId);
     event NodeUpdated(uint256 tokenId, string newNodeURI);
-    event CategoryURIUpdated(string categoryURI);
     event PlatformFeeChanged(address platformAddress);
     event AgentAdded(address account);
     event AgentRemoved(address account);
