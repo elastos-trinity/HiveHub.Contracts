@@ -12,16 +12,8 @@ interface INodeRegistry is IERC721 {
         string nodeEntry;
         address receiptAddr;
         address ownerAddr;
-        address agentAddr;
+        bool isRevealed;
     }
-
-    // agent management
-    function isAgent(address _addr) external view returns (bool);
-    function addAgent(address agent) external;
-    function removeAgent(address agent) external;
-    function renounceAgentship() external;
-    function agentCount() external view returns (uint256);
-    function agents() external view returns (address[] memory);
 
     function mint(uint256 tokenId, string memory tokenURI, string memory nodeEntry, address quoteToken, uint256 mintFee) external payable;
     function mint(uint256 tokenId, string memory tokenURI, string memory nodeEntry, address receiptAddr, address quoteToken, uint256 mintFee) external payable;
@@ -39,9 +31,6 @@ interface INodeRegistry is IERC721 {
     function ownedNodeCount(address ownerAddr) external view returns (uint256);
     function ownedNodeByIndex(address ownerAddr, uint256 index) external view returns (Node memory);
     function ownedNodeIds(address ownerAddr) external view returns (bytes32[] memory);
-    function agentNodeCount(address agentAddr) external view returns (uint256);
-    function agentNodeByIndex(address agentAddr, uint256 index) external view returns (Node memory);
-    function agentNodeIds(address agentAddr) external view returns (bytes32[] memory);
 
     function isValidNodeId(uint256 tokenId) external view returns (bool);
 
@@ -49,10 +38,8 @@ interface INodeRegistry is IERC721 {
     function platformAddress() external view returns (address);
 
     event RegisteredFees(uint256 tokenId, address platformAddr, address quoteToken, uint256 registerFee);
-    event NodeRegistered(uint256 tokenId, string tokenURI, string nodeEntry, address receiptAddr, address ownerAddr, address agentAddr);
+    event NodeRegistered(uint256 tokenId, string tokenURI, string nodeEntry, address receiptAddr, address ownerAddr);
     event NodeUnregistered(uint256 tokenId);
     event NodeUpdated(uint256 tokenId, string newNodeURI);
     event PlatformFeeChanged(address platformAddress);
-    event AgentAdded(address account);
-    event AgentRemoved(address account);
 }
