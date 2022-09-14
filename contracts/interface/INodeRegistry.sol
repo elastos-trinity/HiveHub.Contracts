@@ -17,7 +17,7 @@ interface INodeRegistry is IERC721 {
     function mint(uint256 tokenId, string memory tokenURI, string memory nodeEntry, address receiptAddr) external payable;
     function burn(uint256 tokenId) external;
     function updateNode(uint256 tokenId, string memory tokenURI, address receiptAddr) external;
-    function revealNode() external;
+    function reveal() external;
     function isRevealed() external view returns (uint256);
     function nodeInfo(uint256 tokenId) external view returns (Node memory);
     function nodeCount() external view returns (uint256);
@@ -34,5 +34,5 @@ interface INodeRegistry is IERC721 {
     event NodeUnregistered(uint256 tokenId);
     event NodeUpdated(uint256 tokenId, string newNodeURI);
     event NodeRevealed(uint256 state);
-    event PlatformFeeChanged(address platformAddress);
+    event PlatformFeeChanged(address platformAddress,uint256 platformFee);
 }

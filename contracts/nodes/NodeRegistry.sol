@@ -64,7 +64,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
      * @notice Node revealed event
      * @param state Revealed state, 1 for true, 0 for false
      */
-    event NodeRevealed(uint256 state);
+    event revealed(uint256 state);
 
     /**
      * @dev MUST emit when platform fee config is updated.
@@ -117,7 +117,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
         string memory tokenURI,  // nodeURI
         string memory nodeEntry
     ) external payable nonReentrant {
-        _mintByWallet(tokenId, tokenURI, nodeEntry, msg.sender);
+        _mint(tokenId, tokenURI, nodeEntry, msg.sender);
     }
 
     /**
@@ -133,7 +133,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
         string memory nodeEntry,
         address receiptAddr
     ) external payable nonReentrant {
-        _mintByWallet(tokenId, tokenURI, nodeEntry, receiptAddr);
+        _mint(tokenId, tokenURI, nodeEntry, receiptAddr);
     }
 
     /**
@@ -143,7 +143,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
      * @param nodeEntry Node entry.
      * @param receiptAddr ESC address to receive tipping or other payments.
      */
-    function _mintByWallet(
+    function _mint(
         uint256 tokenId,
         string memory tokenURI,
         string memory nodeEntry,
@@ -155,7 +155,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
         );
         require(
             msg.value == _platformFee,
-            "NodeRegistry: incorrect register fee" 
+            "NodeRegistry: incorrect register fee"
         );
         if (msg.value > 0) {
             bool success;
@@ -271,7 +271,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
         Node memory updatedNode = _allTokens[tokenId];
         updatedNode.tokenId = tokenId;
         updatedNode.tokenURI = tokenURI;
-        if (receiptAddr != address(0)) 
+        if (receiptAddr != address(0))
             updatedNode.receiptAddr = receiptAddr;
         _allTokens[tokenId] = updatedNode;
 
@@ -281,10 +281,10 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
     /**
      * @notice Reveal node
      */
-    function revealNode() external nonReentrant onlyOwner {
+    function reveal() external nonReentrant onlyOwner {
         require(_isRevealed == 0, "NodeRegistry: node is already revealed");
         _isRevealed = 1;
-        emit NodeRevealed(1);
+        emit revealed(1);
     }
 
     /**
@@ -328,7 +328,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
     ) external view returns (Node memory) {
         return _allTokens[tokenId];
     }
-    
+
     /**
      * @notice Get count of existing nodes.
      * @return count existing node count.
@@ -414,7 +414,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
         uint256 platformFee
     ) external onlyOwner {
         require(
-            _setPlatformAddr(platformAddr, platformFee), 
+            _setPlatformAddr(platformAddr, platformFee),
             "NodeRegistry: set platform fee failed"
         );
     }
@@ -447,7 +447,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
     }
 
     receive() external payable {}
-    
+
     fallback() external payable {}
 
     /**
