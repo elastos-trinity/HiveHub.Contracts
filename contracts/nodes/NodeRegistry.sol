@@ -64,9 +64,9 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
 
     /**
      * @notice Node revealed event
-     * @param tokenId Revealed node Id.
+     * @param state Revealed state, 1 for true, 0 for false
      */
-    event NodeRevealed(uint256 tokenId);
+    event NodeRevealed(uint256 state);
 
     /**
      * @dev MUST emit when platform fee config is updated.
@@ -82,11 +82,11 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
         string nodeEntry;
         address receiptAddr;
         address ownerAddr;
-        bool isRevealed;
     }
 
     string private constant _name = "Hive Node Token Collection";
     string private constant _symbol = "HNTC";
+    uint256 private _isRevealed;
     address private _platformAddr;
     mapping(uint256 => Node) private _allTokens;
     EnumerableSet.UintSet private _tokens;
@@ -226,7 +226,6 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
         newNode.nodeEntry = nodeEntry;
         newNode.receiptAddr = receiptAddr;
         newNode.ownerAddr = ownerAddr;
-        newNode.isRevealed = false;
 
         _allTokens[tokenId] = newNode;
         _tokens.add(tokenId);
@@ -317,12 +316,19 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
 
     /**
      * @notice Reveal node
-     * @param tokenId node Id.
      */
-    function revealNode(uint256 tokenId) external nonReentrant onlyOwner {
-        require(_exists(tokenId), "NodeRegistry: invalid nodeId");
-        _allTokens[tokenId].isRevealed = true;
-        emit NodeRevealed(tokenId);
+    function revealNode() external nonReentrant onlyOwner {
+        require(_isRevealed == 0, "NodeRegistry: node is already revealed");
+        _isRevealed = 1;
+        emit NodeRevealed(1);
+    }
+
+    /**
+     * @notice Get revealed state
+     * @return Revealed state
+     */
+    function isRevealed() external view returns (uint256) {
+        return _isRevealed;
     }
 
     /**
@@ -334,7 +340,7 @@ contract NodeRegistry is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override {
         super._beforeTokenTransfer(from, to, tokenId);
         if (from != address(0) && to != address(0))
-            require(_allTokens[tokenId].isRevealed == true, "NodeRegistry: node is not revealed");
+            require(_isRevealed == 1, "NodeRegistry: node is not revealed");
     }
 
     /**
