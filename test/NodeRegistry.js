@@ -111,7 +111,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.nodeEntry).to.be.equal(node1.nodeEntry);
             expect(node_1.receiptAddr).to.be.equal(node1.receipt);
             expect(node_1.ownerAddr).to.be.equal(node1.owner);
-            expect(node_1.isRevealed).to.be.equal(false);
 
             node_2 = await nodeRegistry.nodeInfo(node2.nodeId);
             expect(node_2.tokenId).to.be.equal(node2.nodeId);
@@ -119,7 +118,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_2.nodeEntry).to.be.equal(node2.nodeEntry);
             expect(node_2.receiptAddr).to.be.equal(node2.receipt);
             expect(node_2.ownerAddr).to.be.equal(node2.owner);
-            expect(node_2.isRevealed).to.be.equal(false);
 
             node_3 = await nodeRegistry.nodeInfo(node3.nodeId);
             expect(node_3.tokenId).to.be.equal(node3.nodeId);
@@ -127,7 +125,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_3.nodeEntry).to.be.equal(node3.nodeEntry);
             expect(node_3.receiptAddr).to.be.equal(node3.receipt);
             expect(node_3.ownerAddr).to.be.equal(node3.owner);
-            expect(node_3.isRevealed).to.be.equal(false);
 
             node_4 = await nodeRegistry.nodeInfo(node4.nodeId);
             expect(node_4.tokenId).to.be.equal(node4.nodeId);
@@ -135,7 +132,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_4.nodeEntry).to.be.equal(node4.nodeEntry);
             expect(node_4.receiptAddr).to.be.equal(node4.receipt);
             expect(node_4.ownerAddr).to.be.equal(node4.owner);
-            expect(node_4.isRevealed).to.be.equal(false);
 
             node_5 = await nodeRegistry.nodeInfo(node5.nodeId);
             expect(node_5.tokenId).to.be.equal(node5.nodeId);
@@ -143,7 +139,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_5.nodeEntry).to.be.equal(node5.nodeEntry);
             expect(node_5.receiptAddr).to.be.equal(node5.receipt);
             expect(node_5.ownerAddr).to.be.equal(node5.owner);
-            expect(node_5.isRevealed).to.be.equal(false);
 
             // get nodes
             // count
@@ -209,7 +204,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.nodeEntry).to.be.equal('');
             expect(node_1.receiptAddr).to.be.equal(ethers.constants.AddressZero);
             expect(node_1.ownerAddr).to.be.equal(ethers.constants.AddressZero);
-            expect(node_1.isRevealed).to.be.equal(false);
 
             node_2 = await nodeRegistry.nodeInfo(node2.nodeId);
             expect(node_2.tokenId).to.be.equal(0);
@@ -217,7 +211,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_2.nodeEntry).to.be.equal('');
             expect(node_2.receiptAddr).to.be.equal(ethers.constants.AddressZero);
             expect(node_2.ownerAddr).to.be.equal(ethers.constants.AddressZero);
-            expect(node_2.isRevealed).to.be.equal(false);
 
             node_3 = await nodeRegistry.nodeInfo(node3.nodeId);
             expect(node_3.tokenId).to.be.equal(node3.nodeId);
@@ -225,7 +218,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_3.nodeEntry).to.be.equal(node3.nodeEntry);
             expect(node_3.receiptAddr).to.be.equal(node3.receipt);
             expect(node_3.ownerAddr).to.be.equal(node3.owner);
-            expect(node_3.isRevealed).to.be.equal(false);
 
             node_4 = await nodeRegistry.nodeInfo(node4.nodeId);
             expect(node_4.tokenId).to.be.equal(node4.nodeId);
@@ -233,7 +225,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_4.nodeEntry).to.be.equal(node4.nodeEntry);
             expect(node_4.receiptAddr).to.be.equal(node4.receipt);
             expect(node_4.ownerAddr).to.be.equal(node4.owner);
-            expect(node_4.isRevealed).to.be.equal(false);
 
             node_5 = await nodeRegistry.nodeInfo(node5.nodeId);
             expect(node_5.tokenId).to.be.equal(node5.nodeId);
@@ -241,7 +232,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_5.nodeEntry).to.be.equal(node5.nodeEntry);
             expect(node_5.receiptAddr).to.be.equal(node5.receipt);
             expect(node_5.ownerAddr).to.be.equal(node5.owner);
-            expect(node_5.isRevealed).to.be.equal(false);
 
             // get nodes
             // count
@@ -310,7 +300,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.nodeEntry).to.be.equal('');
             expect(node_1.receiptAddr).to.be.equal(ethers.constants.AddressZero);
             expect(node_1.ownerAddr).to.be.equal(ethers.constants.AddressZero);
-            expect(node_1.isRevealed).to.be.equal(false);
 
             node_2 = await nodeRegistry.nodeInfo(node2.nodeId);
             expect(node_2.tokenId).to.be.equal(0);
@@ -318,7 +307,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_2.nodeEntry).to.be.equal('');
             expect(node_2.receiptAddr).to.be.equal(ethers.constants.AddressZero);
             expect(node_2.ownerAddr).to.be.equal(ethers.constants.AddressZero);
-            expect(node_2.isRevealed).to.be.equal(false);
 
             node_3 = await nodeRegistry.nodeInfo(node3.nodeId);
             expect(node_3.tokenId).to.be.equal(node3.nodeId);
@@ -326,7 +314,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_3.nodeEntry).to.be.equal(node3.nodeEntry);
             expect(node_3.receiptAddr).to.be.equal(node3.receipt);
             expect(node_3.ownerAddr).to.be.equal(node3.owner);
-            expect(node_3.isRevealed).to.be.equal(false);
 
             node_4 = await nodeRegistry.nodeInfo(node4.nodeId);
             expect(node_4.tokenId).to.be.equal(node4.nodeId);
@@ -334,7 +321,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_4.nodeEntry).to.be.equal(node4.nodeEntry);
             expect(node_4.receiptAddr).to.be.equal(node4.updatedReceipt);
             expect(node_4.ownerAddr).to.be.equal(node4.owner);
-            expect(node_4.isRevealed).to.be.equal(false);
 
             node_5 = await nodeRegistry.nodeInfo(node5.nodeId);
             expect(node_5.tokenId).to.be.equal(node5.nodeId);
@@ -342,7 +328,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_5.nodeEntry).to.be.equal(node5.nodeEntry);
             expect(node_5.receiptAddr).to.be.equal(node5.receipt); // original
             expect(node_5.ownerAddr).to.be.equal(node5.owner);
-            expect(node_5.isRevealed).to.be.equal(false);
 
             node_6 = await nodeRegistry.nodeInfo(node6.nodeId);
             expect(node_6.tokenId).to.be.equal(0);
@@ -350,7 +335,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_6.nodeEntry).to.be.equal('');
             expect(node_6.receiptAddr).to.be.equal(ethers.constants.AddressZero);
             expect(node_6.ownerAddr).to.be.equal(ethers.constants.AddressZero);
-            expect(node_6.isRevealed).to.be.equal(false);
 
             node_7 = await nodeRegistry.nodeInfo(node7.nodeId);
             expect(node_7.tokenId).to.be.equal(node7.nodeId);
@@ -358,7 +342,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_7.nodeEntry).to.be.equal(node7.nodeEntry);
             expect(node_7.receiptAddr).to.be.equal(node7.receipt);
             expect(node_7.ownerAddr).to.be.equal(node7.owner);
-            expect(node_7.isRevealed).to.be.equal(false);
 
             // get nodes
             // count
@@ -412,18 +395,18 @@ describe("NodeRegistry Contract", function () {
                 .to.emit(nodeRegistry, "RegisteredFees").withArgs(node1.nodeId, platform.address, node1.quoteToken, node1.fee)
                 .to.emit(nodeRegistry, "NodeRegistered").withArgs(node1.nodeId, node1.nodeUri, node1.nodeEntry, node1.receipt, node1.owner);
             // ********************************************************  Reveal node  ******************************************************** //
+            expect(await nodeRegistry.isRevealed()).to.be.equal(0);
             // Transfer node before reveal node
             await expect(nodeRegistry.connect(owner).transferFrom(addr1.address, addr2.address, node1.nodeId)).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
             await expect(nodeRegistry.connect(addr1).transferFrom(addr1.address, addr2.address, node1.nodeId)).to.be.revertedWith("NodeRegistry: node is not revealed");
 
             // Reveal node
                 // check input value
-            await expect(nodeRegistry.connect(addr1).revealNode(BigNumber.from("8"))).to.be.revertedWith("Ownable: caller is not the owner");
-            await expect(nodeRegistry.connect(addr1).revealNode(BigNumber.from("1"))).to.be.revertedWith("Ownable: caller is not the owner");
-            await expect(nodeRegistry.connect(owner).revealNode(BigNumber.from("0"))).to.be.revertedWith("NodeRegistry: invalid nodeId");
-                // reveal node
-            await expect(nodeRegistry.connect(owner).revealNode(node1.nodeId)).to.emit(nodeRegistry, "NodeRevealed").withArgs(node1.nodeId);
-
+            await expect(nodeRegistry.connect(addr1).revealNode()).to.be.revertedWith("Ownable: caller is not the owner");
+            // reveal node
+            await expect(nodeRegistry.connect(owner).revealNode()).to.emit(nodeRegistry, "NodeRevealed").withArgs(1);
+            await expect(nodeRegistry.connect(owner).revealNode()).to.be.revertedWith("NodeRegistry: node is already revealed");
+            expect(await nodeRegistry.isRevealed()).to.be.equal(1);
             // Transfer node like this: addr1 -> addr2 -> owner -> addr2
             // ********************************************************  Transfer node  ******************************************************** //
             // Transfer (addr1 => addr2)
@@ -436,7 +419,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.nodeEntry).to.be.equal(node1.nodeEntry);
             expect(node_1.receiptAddr).to.be.equal(node1.receipt);
             expect(node_1.ownerAddr).to.be.equal(addr2.address);
-            expect(node_1.isRevealed).to.be.equal(true);
             // Transfer (addr2 => owner)
             await expect(nodeRegistry.connect(addr1).approve(addr1.address, node1.nodeId)).to.be.revertedWith("ERC721: approve caller is not owner nor approved for all");
             await expect(nodeRegistry.connect(addr2).approve(addr1.address, node1.nodeId)).to.emit(nodeRegistry, "Approval").withArgs(addr2.address, addr1.address, node1.nodeId);
@@ -448,7 +430,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.nodeEntry).to.be.equal(node1.nodeEntry);
             expect(node_1.receiptAddr).to.be.equal(node1.receipt);
             expect(node_1.ownerAddr).to.be.equal(owner.address);
-            expect(node_1.isRevealed).to.be.equal(true);
             // Transfer (owner => addr2)
             await expect(nodeRegistry.connect(addr2).approve(addr1.address, node1.nodeId)).to.be.revertedWith("ERC721: approve caller is not owner nor approved for all");
             await expect(nodeRegistry.connect(owner).setApprovalForAll(addr1.address, true)).to.emit(nodeRegistry, "ApprovalForAll").withArgs(owner.address, addr1.address, true);
@@ -461,7 +442,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.nodeEntry).to.be.equal(node1.nodeEntry);
             expect(node_1.receiptAddr).to.be.equal(node1.receipt);
             expect(node_1.ownerAddr).to.be.equal(addr2.address);
-            expect(node_1.isRevealed).to.be.equal(true);
 
             // ********************************************************  Update  ******************************************************** //
             await expect(nodeRegistry.connect(addr1)['updateNode(uint256,string,address)'](node1.nodeId, node2.nodeUri, node2.receipt)).to.be.revertedWith("NodeRegistry: caller is not node owner");
@@ -475,7 +455,6 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.nodeEntry).to.be.equal(node1.nodeEntry);
             expect(node_1.receiptAddr).to.be.equal(node2.receipt);
             expect(node_1.ownerAddr).to.be.equal(addr2.address);
-            expect(node_1.isRevealed).to.be.equal(true);
             // ********************************************************  Unregister  ******************************************************** //
             await expect(nodeRegistry.connect(addr1)['burn(uint256)'](node1.nodeId)).to.be.revertedWith("NodeRegistry: caller is not node owner or contract owner");
             // unregister with node owner
