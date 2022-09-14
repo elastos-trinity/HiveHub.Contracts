@@ -71,15 +71,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
     event NodeRevealed(uint256 tokenId);
 
     /**
-     * @dev MUST emit when categories URI is updated.
-     * The `categoryURI` argument MUST be the updated uri of the categories.
-     */
-
-    event CategoryURIUpdated(
-        string categoryURI
-    );
-
-    /**
      * @dev MUST emit when platform fee config is updated.
      * The `platformAddress` argument MUST be the address of the platform.
      */
@@ -116,7 +107,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
     string private constant _name = "Hive Node Token Collection";
     string private constant _symbol = "HNTC";
     address private _platformAddr;
-    string private _categoryURI;
     mapping(uint256 => Node) private _allTokens;
     EnumerableSet.UintSet private _tokens;
     mapping(address => EnumerableSet.UintSet) private _agentTokens;
@@ -127,18 +117,13 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
     /**
      * @notice Initialize a node registry contract with platform address info.
      * @param platformAddress_ platform address.
-     * @param categoryURI_ category uri.
      */
-    function initialize(address platformAddress_, string memory categoryURI_) external initializer {
+    function initialize(address platformAddress_) external initializer {
         __Ownable_init();
         __ERC721_init(_name, _symbol);
         require(
             _setPlatformAddr(platformAddress_),
             "NodeRegistry: initialize platform address failed"
-        );
-        require(
-            _setCategoryList(categoryURI_),
-            "NodeRegistry: initialize category failed"
         );
     }
 
@@ -628,38 +613,6 @@ contract NodeRegistry is Agentable, ReentrancyGuardUpgradeable, ERC721 {
         uint256 tokenId
     ) external view returns (bool) {
         return _exists(tokenId);
-    }
-
-    /**
-     * @notice Set category list only by owner.
-     * @param categeoryURI IPFS URI of the list of categories.
-     */
-    function setCategoryList(
-        string memory categeoryURI
-    ) external onlyOwner {
-        require(
-            _setCategoryList(categeoryURI), 
-            "NodeRegistry: set category failed"
-        );
-    }
-
-    /**
-     * @notice Set category list.
-     * @param categeoryURI IPFS URI of the list of categories.
-     */
-    function _setCategoryList(
-        string memory categeoryURI
-    ) internal returns (bool) {
-        _categoryURI = categeoryURI;
-        emit CategoryURIUpdated(categeoryURI);
-        return true;
-    }
-
-    /**
-     * @notice Get category list.
-     */
-    function getCategoryList() external view returns (string memory) {
-        return _categoryURI;
     }
 
     /**
