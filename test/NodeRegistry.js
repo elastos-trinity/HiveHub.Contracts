@@ -5,7 +5,7 @@ const { ethers, upgrades } = require("hardhat");
 
 describe("NodeRegistry Contract", function () {
     let NodeRegistry, nodeRegistry, TESTERC20, testERC20, MockNR, mockNR;
-    let owner, addr1, addr2, addrs, platform, categoriesURI = "init category uri";
+    let owner, addr1, addr2, addrs, platform;
     let receipt1, receipt2, receipt3, receipt4, receipt5;
 
     before(async function () {
@@ -20,7 +20,7 @@ describe("NodeRegistry Contract", function () {
         testERC20 = await TESTERC20.deploy();
         await testERC20.deployed();
         // deploy proxy contract
-        nodeRegistry = await upgrades.deployProxy(NodeRegistry, [platform.address, categoriesURI]);
+        nodeRegistry = await upgrades.deployProxy(NodeRegistry, [platform.address]);
         await nodeRegistry.deployed();
     });
 
@@ -1116,18 +1116,6 @@ describe("NodeRegistry Contract", function () {
             expect(agents.length).to.be.equal(0);
             expect(await nodeRegistry.isAgent(addr1.address)).to.be.equal(false);
             expect(await nodeRegistry.isAgent(addr2.address)).to.be.equal(false);
-        });
-
-        it("Should be able to manage categories uri", async function () {
-            const updatedCategoryUri = "updated node uri";
-
-            // check inital categoriesURI
-            expect(await nodeRegistry.getCategoryList()).to.be.equal(categoriesURI);
-            // check input value
-            await expect(nodeRegistry.connect(addr1).setCategoryList(updatedCategoryUri)).to.be.revertedWith("Ownable: caller is not the owner");
-            await expect(nodeRegistry.connect(owner).setCategoryList(updatedCategoryUri)).to.emit(nodeRegistry, "CategoryURIUpdated").withArgs(updatedCategoryUri);
-            // check updated categoriesURI
-            expect(await nodeRegistry.getCategoryList()).to.be.equal(updatedCategoryUri);
         });
 
         it("Should be able to manage platform address", async function () {
