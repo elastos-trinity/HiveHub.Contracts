@@ -42,11 +42,11 @@ describe("NodeRegistry Contract", function () {
             const platformInfo = await nodeRegistry.getPlatformFee();
             expect(platformInfo.platformAddress).to.be.equal(platform.address);
             expect(platformInfo.platformFee).to.be.equal(platformFee);
-            
+
             // check node count
             expect(await nodeRegistry.getLastTokenId()).to.be.equal(0);
             expect(await nodeRegistry.totalSupply()).to.be.equal(0);
-            
+
             // ********************************************************  Register  ******************************************************** //
             // register with native token (value != 0)
             // check balance
@@ -131,31 +131,31 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.tokenId).to.be.equal(node1.nodeId);
             expect(node_1.tokenURI).to.be.equal(node1.nodeUri);
             expect(node_1.nodeEntry).to.be.equal(node1.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node1.nodeUri, node1.nodeEntry)).to.be.equal(node1.nodeId);
+            expect(await nodeRegistry.getTokenId(node1.nodeEntry)).to.be.equal(node1.nodeId);
 
             node_2 = await nodeRegistry.nodeInfo(node2.nodeId);
             expect(node_2.tokenId).to.be.equal(node2.nodeId);
             expect(node_2.tokenURI).to.be.equal(node2.nodeUri);
             expect(node_2.nodeEntry).to.be.equal(node2.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node2.nodeUri, node2.nodeEntry)).to.be.equal(node2.nodeId);
+            expect(await nodeRegistry.getTokenId(node2.nodeEntry)).to.be.equal(node2.nodeId);
 
             node_3 = await nodeRegistry.nodeInfo(node3.nodeId);
             expect(node_3.tokenId).to.be.equal(node3.nodeId);
             expect(node_3.tokenURI).to.be.equal(node3.nodeUri);
             expect(node_3.nodeEntry).to.be.equal(node3.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node3.nodeUri, node3.nodeEntry)).to.be.equal(node3.nodeId);
+            expect(await nodeRegistry.getTokenId(node3.nodeEntry)).to.be.equal(node3.nodeId);
 
             node_4 = await nodeRegistry.nodeInfo(node4.nodeId);
             expect(node_4.tokenId).to.be.equal(node4.nodeId);
             expect(node_4.tokenURI).to.be.equal(node4.nodeUri);
             expect(node_4.nodeEntry).to.be.equal(node4.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node4.nodeUri, node4.nodeEntry)).to.be.equal(node4.nodeId);
+            expect(await nodeRegistry.getTokenId(node4.nodeEntry)).to.be.equal(node4.nodeId);
 
             node_5 = await nodeRegistry.nodeInfo(node5.nodeId);
             expect(node_5.tokenId).to.be.equal(node5.nodeId);
             expect(node_5.tokenURI).to.be.equal(node5.nodeUri);
             expect(node_5.nodeEntry).to.be.equal(node5.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node5.nodeUri, node5.nodeEntry)).to.be.equal(node5.nodeId);
+            expect(await nodeRegistry.getTokenId(node5.nodeEntry)).to.be.equal(node5.nodeId);
 
             // get nodes
             // count
@@ -222,31 +222,31 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.tokenId).to.be.equal(0);
             expect(node_1.tokenURI).to.be.equal('');
             expect(node_1.nodeEntry).to.be.equal('');
-            expect(await nodeRegistry.getTokenId(node1.nodeUri, node1.nodeEntry)).to.be.equal(0);
+            expect(await nodeRegistry.getTokenId(node1.nodeEntry)).to.be.equal(0);
 
             node_2 = await nodeRegistry.nodeInfo(node2.nodeId);
             expect(node_2.tokenId).to.be.equal(0);
             expect(node_2.tokenURI).to.be.equal('');
             expect(node_2.nodeEntry).to.be.equal('');
-            expect(await nodeRegistry.getTokenId(node2.nodeUri, node2.nodeEntry)).to.be.equal(0);
+            expect(await nodeRegistry.getTokenId(node2.nodeEntry)).to.be.equal(0);
 
             node_3 = await nodeRegistry.nodeInfo(node3.nodeId);
             expect(node_3.tokenId).to.be.equal(node3.nodeId);
             expect(node_3.tokenURI).to.be.equal(node3.nodeUri);
             expect(node_3.nodeEntry).to.be.equal(node3.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node3.nodeUri, node3.nodeEntry)).to.be.equal(node3.nodeId);
+            expect(await nodeRegistry.getTokenId(node3.nodeEntry)).to.be.equal(node3.nodeId);
 
             node_4 = await nodeRegistry.nodeInfo(node4.nodeId);
             expect(node_4.tokenId).to.be.equal(node4.nodeId);
             expect(node_4.tokenURI).to.be.equal(node4.nodeUri);
             expect(node_4.nodeEntry).to.be.equal(node4.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node4.nodeUri, node4.nodeEntry)).to.be.equal(node4.nodeId);
+            expect(await nodeRegistry.getTokenId(node4.nodeEntry)).to.be.equal(node4.nodeId);
 
             node_5 = await nodeRegistry.nodeInfo(node5.nodeId);
             expect(node_5.tokenId).to.be.equal(node5.nodeId);
             expect(node_5.tokenURI).to.be.equal(node5.nodeUri);
             expect(node_5.nodeEntry).to.be.equal(node5.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node5.nodeUri, node5.nodeEntry)).to.be.equal(node5.nodeId);
+            expect(await nodeRegistry.getTokenId(node5.nodeEntry)).to.be.equal(node5.nodeId);
 
             // get nodes
             // count
@@ -305,11 +305,11 @@ describe("NodeRegistry Contract", function () {
 
             await expect(nodeRegistry.connect(addr1).updateNode(node4.nodeId, node2.nodeUri, node4.nodeEntry)).to.emit(nodeRegistry, "NodeUpdated").withArgs(node4.nodeId, node2.nodeUri, node4.nodeEntry);
             await expect(nodeRegistry.connect(owner).updateNode(node5.nodeId, node2.nodeUri, node4.nodeEntry)).to.be.revertedWith("NodeRegistry: duplicated node");
-            
+
             await expect(nodeRegistry.connect(owner).updateNode(node5.nodeId, node5.updatedNodeUri, node5.updatedNodeEntry)).to.emit(nodeRegistry, "NodeUpdated").withArgs(node5.nodeId, node5.updatedNodeUri, node5.updatedNodeEntry);
             await expect(nodeRegistry.connect(addr1).updateNode(node4.nodeId, node4.updatedNodeUri, node4.updatedNodeEntry)).to.emit(nodeRegistry, "NodeUpdated").withArgs(node4.nodeId, node4.updatedNodeUri, node4.updatedNodeEntry);
             await expect(nodeRegistry.connect(addr2).updateNode(node1.nodeId, node1.updatedNodeUri, node1.updatedNodeEntry)).to.be.revertedWith("NodeRegistry: invalid nodeId");
-            // unregister            
+            // unregister
             await expect(nodeRegistry.connect(owner).burn(node6.nodeId)).to.emit(nodeRegistry, "NodeUnregistered").withArgs(node6.nodeId);
 
             // ********************************************************  Check state  ******************************************************** //
@@ -321,45 +321,45 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.tokenId).to.be.equal(0);
             expect(node_1.tokenURI).to.be.equal('');
             expect(node_1.nodeEntry).to.be.equal('');
-            expect(await nodeRegistry.getTokenId(node1.nodeUri, node1.nodeEntry)).to.be.equal(0);
+            expect(await nodeRegistry.getTokenId(node1.nodeEntry)).to.be.equal(0);
 
             node_2 = await nodeRegistry.nodeInfo(node2.nodeId);
             expect(node_2.tokenId).to.be.equal(0);
             expect(node_2.tokenURI).to.be.equal('');
             expect(node_2.nodeEntry).to.be.equal('');
-            expect(await nodeRegistry.getTokenId(node2.nodeUri, node2.nodeEntry)).to.be.equal(0);
+            expect(await nodeRegistry.getTokenId(node2.nodeEntry)).to.be.equal(0);
 
             node_3 = await nodeRegistry.nodeInfo(node3.nodeId);
             expect(node_3.tokenId).to.be.equal(node3.nodeId);
             expect(node_3.tokenURI).to.be.equal(node3.nodeUri);
             expect(node_3.nodeEntry).to.be.equal(node3.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node3.nodeUri, node3.nodeEntry)).to.be.equal(node3.nodeId);
+            expect(await nodeRegistry.getTokenId(node3.nodeEntry)).to.be.equal(node3.nodeId);
 
             node_4 = await nodeRegistry.nodeInfo(node4.nodeId);
             expect(node_4.tokenId).to.be.equal(node4.nodeId);
             expect(node_4.tokenURI).to.be.equal(node4.updatedNodeUri);
             expect(node_4.nodeEntry).to.be.equal(node4.updatedNodeEntry);
-            expect(await nodeRegistry.getTokenId(node4.nodeUri, node4.nodeEntry)).to.be.equal(0);
-            expect(await nodeRegistry.getTokenId(node4.updatedNodeUri, node4.updatedNodeEntry)).to.be.equal(node4.nodeId);
+            expect(await nodeRegistry.getTokenId(node4.nodeEntry)).to.be.equal(0);
+            expect(await nodeRegistry.getTokenId(node4.updatedNodeEntry)).to.be.equal(node4.nodeId);
 
             node_5 = await nodeRegistry.nodeInfo(node5.nodeId);
             expect(node_5.tokenId).to.be.equal(node5.nodeId);
             expect(node_5.tokenURI).to.be.equal(node5.updatedNodeUri);
             expect(node_5.nodeEntry).to.be.equal(node5.updatedNodeEntry);
-            expect(await nodeRegistry.getTokenId(node5.nodeUri, node5.nodeEntry)).to.be.equal(0);
-            expect(await nodeRegistry.getTokenId(node5.updatedNodeUri, node5.updatedNodeEntry)).to.be.equal(node5.nodeId);
+            expect(await nodeRegistry.getTokenId(node5.nodeEntry)).to.be.equal(0);
+            expect(await nodeRegistry.getTokenId(node5.updatedNodeEntry)).to.be.equal(node5.nodeId);
 
             node_6 = await nodeRegistry.nodeInfo(node6.nodeId);
             expect(node_6.tokenId).to.be.equal(0);
             expect(node_6.tokenURI).to.be.equal('');
             expect(node_6.nodeEntry).to.be.equal('');
-            expect(await nodeRegistry.getTokenId(node6.nodeUri, node6.nodeEntry)).to.be.equal(0);
+            expect(await nodeRegistry.getTokenId(node6.nodeEntry)).to.be.equal(0);
 
             node_7 = await nodeRegistry.nodeInfo(node7.nodeId);
             expect(node_7.tokenId).to.be.equal(node7.nodeId);
             expect(node_7.tokenURI).to.be.equal(node7.nodeUri);
             expect(node_7.nodeEntry).to.be.equal(node7.nodeEntry);
-            expect(await nodeRegistry.getTokenId(node7.nodeUri, node7.nodeEntry)).to.be.equal(node7.nodeId);
+            expect(await nodeRegistry.getTokenId(node7.nodeEntry)).to.be.equal(node7.nodeId);
 
             // get nodes
             // count
@@ -430,7 +430,7 @@ describe("NodeRegistry Contract", function () {
             // Transfer (addr1 => addr2)
             await expect(nodeRegistry.connect(owner).transferFrom(addr1.address, addr2.address, node1.nodeId)).to.be.revertedWith("ERC721: transfer caller is not owner nor approved");
             await expect(nodeRegistry.connect(addr1).transferFrom(addr1.address, addr2.address, node1.nodeId)).to.emit(nodeRegistry, "Transfer").withArgs(addr1.address, addr2.address, node1.nodeId);
-            // check state            
+            // check state
             node_1 = await nodeRegistry.nodeInfo(node1.nodeId);
             expect(node_1.tokenId).to.be.equal(node1.nodeId);
             expect(node_1.tokenURI).to.be.equal(node1.nodeUri);
@@ -439,7 +439,7 @@ describe("NodeRegistry Contract", function () {
             await expect(nodeRegistry.connect(addr1).approve(addr1.address, node1.nodeId)).to.be.revertedWith("ERC721: approve caller is not owner nor approved for all");
             await expect(nodeRegistry.connect(addr2).approve(addr1.address, node1.nodeId)).to.emit(nodeRegistry, "Approval").withArgs(addr2.address, addr1.address, node1.nodeId);
             await expect(nodeRegistry.connect(addr1).transferFrom(addr2.address, owner.address, node1.nodeId)).to.emit(nodeRegistry, "Transfer").withArgs(addr2.address, owner.address, node1.nodeId);
-            // check state            
+            // check state
             node_1 = await nodeRegistry.nodeInfo(node1.nodeId);
             expect(node_1.tokenId).to.be.equal(node1.nodeId);
             expect(node_1.tokenURI).to.be.equal(node1.nodeUri);
@@ -449,7 +449,7 @@ describe("NodeRegistry Contract", function () {
             await expect(nodeRegistry.connect(owner).setApprovalForAll(addr1.address, true)).to.emit(nodeRegistry, "ApprovalForAll").withArgs(owner.address, addr1.address, true);
             await expect(nodeRegistry.connect(addr1).approve(addr2.address, node1.nodeId)).to.emit(nodeRegistry, "Approval").withArgs(owner.address, addr2.address, node1.nodeId);
             await expect(nodeRegistry.connect(addr2).transferFrom(owner.address, addr2.address, node1.nodeId)).to.emit(nodeRegistry, "Transfer").withArgs(owner.address, addr2.address, node1.nodeId);
-            // check state            
+            // check state
             node_1 = await nodeRegistry.nodeInfo(node1.nodeId);
             expect(node_1.tokenId).to.be.equal(node1.nodeId);
             expect(node_1.tokenURI).to.be.equal(node1.nodeUri);
@@ -498,7 +498,7 @@ describe("NodeRegistry Contract", function () {
             const node1 = { nodeId: BigNumber.from("1"), nodeUri: "first node uri", nodeEntry: "first node entry", fee: registerFee };
             const node2 = { nodeId: BigNumber.from("2"), nodeUri: "second node uri", nodeEntry: "second node entry", fee: registerFee };
             const node3 = { nodeId: BigNumber.from("3"), nodeUri: "third node uri", nodeEntry: "third node entry", fee: registerFee };
-            
+
             expect(await nodeRegistry.paused()).to.be.equal(false);
             // ********************************************************  Register  ******************************************************** //
             await expect(nodeRegistry.connect(addr1).mint(node1.nodeUri, node1.nodeEntry, { value: node1.fee }))
@@ -556,7 +556,7 @@ describe("NodeRegistry Contract", function () {
             // register 1 node
             await expect(nodeRegistry.connect(owner).mint(node3.nodeUri, node3.nodeEntry, { value: node3.fee }))
                 .to.emit(nodeRegistry, "RegisteredFees").withArgs(node3.nodeId, platform.address, node3.fee)
-                .to.emit(nodeRegistry, "NodeRegistered").withArgs(node3.nodeId, node3.nodeUri, node3.nodeEntry);            
+                .to.emit(nodeRegistry, "NodeRegistered").withArgs(node3.nodeId, node3.nodeUri, node3.nodeEntry);
             expect(await nodeRegistry.getLastTokenId()).to.be.equal(3);
 
             const updatedVersion = 2;

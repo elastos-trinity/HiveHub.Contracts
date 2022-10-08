@@ -16,16 +16,16 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
     using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableSet for EnumerableSet.AddressSet;
-    
-    string private constant _name = "Hive Node Token Collection";
-    string private constant _symbol = "HNTC";
+
+    string private constant _name = "Hive Node Registry";
+    string private constant _symbol = "HNRC";
     uint256 private _lastTokenId;
     uint256 private _isRevealed;
     uint256 private _platformFee;
     address private _platformAddr;
     mapping(uint256 => Node) private _allTokens;
     EnumerableSet.UintSet private _tokens;
-    mapping(string => mapping(string => uint256)) private _nodeToTokenId;
+    mapping(string => uint256) private _nodeEntryToTokenId;
 
     /**
      * @notice Initialize a node registry contract with platform address info.
@@ -37,7 +37,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
         __Pausable_init();
         __ERC721_init(_name, _symbol);
         require(
-            _setPlatformAddr(platformAddress_, platformFee_),
+            _setPlatformFee(platformAddress_, platformFee_),
             "NodeRegistry: initialize platform fee failed"
         );
     }
@@ -67,7 +67,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
         string memory nodeEntry
     ) external payable nonReentrant whenNotPaused {
         require(
-            _nodeToTokenId[tokenURI][nodeEntry] == 0,
+            _nodeEntryToTokenId[nodeEntry] == 0,
             "NodeRegistry: duplicated node"
         );
         require(
@@ -81,7 +81,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
         }
         uint256 tokenId = _lastTokenId.add(1);
         emit RegisteredFees(tokenId, _platformAddr, msg.value);
-        
+
         _mint(msg.sender, tokenId);
         _setTokenURI(tokenId, tokenURI);
 
@@ -93,7 +93,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
         _allTokens[tokenId] = newNode;
         _tokens.add(tokenId);
         _lastTokenId = tokenId;
-        _nodeToTokenId[tokenURI][nodeEntry] = tokenId;
+        _nodeEntryToTokenId[nodeEntry] = tokenId;
 
         emit NodeRegistered(tokenId, tokenURI, nodeEntry);
     }
@@ -114,10 +114,10 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
             "NodeRegistry: caller is not node owner or contract owner"
         );
         super._burn(tokenId);
-        
+
         Node memory nodeToBurn = _allTokens[tokenId];
         _tokens.remove(tokenId);
-        _nodeToTokenId[nodeToBurn.tokenURI][nodeToBurn.nodeEntry] = 0;
+        _nodeEntryToTokenId[nodeToBurn.nodeEntry] = 0;
         delete _allTokens[tokenId];
 
         emit NodeUnregistered(tokenId);
@@ -143,17 +143,17 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
             "NodeRegistry: caller is not node owner"
         );
         require(
-            _nodeToTokenId[tokenURI][nodeEntry] == 0,
+            _nodeEntryToTokenId[nodeEntry] == 0 || _nodeEntryToTokenId[nodeEntry] == tokenId,
             "NodeRegistry: duplicated node"
         );
         Node memory updatedNode = _allTokens[tokenId];
-        _nodeToTokenId[updatedNode.tokenURI][updatedNode.nodeEntry] = 0;
+        _nodeEntryToTokenId[updatedNode.nodeEntry] = 0;
 
         updatedNode.tokenURI = tokenURI;
         updatedNode.nodeEntry = nodeEntry;
 
         _allTokens[tokenId] = updatedNode;
-        _nodeToTokenId[tokenURI][nodeEntry] = tokenId;
+        _nodeEntryToTokenId[nodeEntry] = tokenId;
 
         emit NodeUpdated(tokenId, tokenURI, nodeEntry);
     }
@@ -283,14 +283,13 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
 
     /**
      * @notice Get node Id from node uri and node entry.
-     * @param tokenURI Node URI.
      * @param nodeEntry Node Entry.
      * @return The node Id
      */
     function getTokenId(
-        string memory tokenURI, string memory nodeEntry
+        string memory nodeEntry
     ) external view returns (uint256) {
-        return _nodeToTokenId[tokenURI][nodeEntry];
+        return _nodeEntryToTokenId[nodeEntry];
     }
 
     /**
@@ -303,7 +302,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
         uint256 platformFee
     ) external onlyOwner {
         require(
-            _setPlatformAddr(platformAddr, platformFee),
+            _setPlatformFee(platformAddr, platformFee),
             "NodeRegistry: set platform fee failed"
         );
     }
@@ -314,7 +313,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
      * @param platformFee Platform Fee
      * @return success success or failed
      */
-    function _setPlatformAddr(address platformAddr, uint256 platformFee) internal returns (bool) {
+    function _setPlatformFee(address platformAddr, uint256 platformFee) internal returns (bool) {
         require(
             platformAddr != address(0),
             "NodeRegistry: invalid platform address"

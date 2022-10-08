@@ -96,7 +96,7 @@ interface INodeRegistry is IERC721, INodeRegistryDataAndEvents {
     function ownedNodeIds(address ownerAddr) external view returns (bytes32[] memory);
     function isValidNodeId(uint256 tokenId) external view returns (bool);
     function getLastTokenId() external view returns (uint256);
-    function getTokenId(string memory tokenURI, string memory nodeEntry) external view returns (uint256);
+    function getTokenId(string memory nodeEntry) external view returns (uint256);
     function setPlatformFee(address platformAddr, uint256 platformFee) external;
     function getPlatformFee() external view returns (address platformAddress, uint256 platformFee);
 }
