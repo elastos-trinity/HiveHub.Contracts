@@ -3,19 +3,15 @@
 pragma solidity =0.7.6;
 pragma abicoder v2;
 
-
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "../interface/INodeRegistry.sol";
-import "../common/EnumerableSet.sol";
-import "../common/PausableUpgradeable.sol";
-import "../common/OwnableUpgradeable.sol";
-import "../common/ReentrancyGuardUpgradeable.sol";
-import "../token/ERC20/IERC20.sol";
-import "../token/ERC721/ERC721.sol";
+import "../token/ERC721.sol";
 
-contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721, PausableUpgradeable {
+contract NodeRegistry is INodeRegistryDataAndEvents, ERC721, Ownable, ReentrancyGuard, Pausable {
     using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.UintSet;
-    using EnumerableSet for EnumerableSet.AddressSet;
 
     string private constant _name = "Hive Node Registry";
     string private constant _symbol = "HNRC";
@@ -29,28 +25,27 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
 
     /**
      * @notice Initialize a node registry contract with platform address info.
+     * @param lastTokenId_ start index of token Id. (start from lastTokenId_ + 1)
      * @param platformAddress_ platform address.
      * @param platformFee_ platform fee.
      */
-    function initialize(address platformAddress_, uint256 platformFee_) external initializer {
-        __Ownable_init();
-        __Pausable_init();
-        __ERC721_init(_name, _symbol);
+    constructor(uint256 lastTokenId_, address platformAddress_, uint256 platformFee_) ERC721(_name, _symbol) {
         require(
             _setPlatformFee(platformAddress_, platformFee_),
             "NodeRegistry: initialize platform fee failed"
         );
+        _lastTokenId = lastTokenId_;
     }
 
     /**
-     * @notice Pause the vesting release.
+     * @notice Pause the node registry contract.
      */
     function pause() external onlyOwner {
         _pause();
     }
 
     /**
-     * @notice Unpause the vesting release.
+     * @notice Unpause the node registry contract.
      */
     function unpause() external onlyOwner {
         require(_platformAddr != address(0), "NodeRegistry: Contract is not initialized");
@@ -111,7 +106,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, OwnableUpgradeable, Reentra
         );
         require(
             ownerOf(tokenId) == msg.sender || msg.sender == owner(),
-            "NodeRegistry: caller is not node owner or contract owner"
+            "NodeRegistry: caller is not node owner nor contract owner"
         );
         super._burn(tokenId);
 

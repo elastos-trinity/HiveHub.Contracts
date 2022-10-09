@@ -3,7 +3,8 @@
 pragma solidity =0.7.6;
 pragma abicoder v2;
 
-import "../token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "./IPausable.sol";
 
 interface INodeRegistryDataAndEvents {
     /**
@@ -79,24 +80,118 @@ interface INodeRegistryDataAndEvents {
     );
 }
 
-interface INodeRegistry is IERC721, INodeRegistryDataAndEvents {
-    function pause() external;
-    function unpause() external;
+interface INodeRegistry is IERC721, IPausable, INodeRegistryDataAndEvents {
+    /**
+     * @notice Register a new node by personal wallet.
+     * @param tokenURI Node uri.
+     * @param nodeEntry Node entry.
+     */
     function mint(string memory tokenURI, string memory nodeEntry) external payable;
+
+    /**
+     * @notice Unregister a node by personal wallet.
+     * @param tokenId Node Id to be removed.
+     */
     function burn(uint256 tokenId) external;
+
+    /**
+     * @notice Update node by personal wallet.
+     * @param tokenId Node Id to be updated.
+     * @param tokenURI Updated node uri.
+     * @param nodeEntry Updated node entry.
+     */
     function updateNode(uint256 tokenId, string memory tokenURI, string memory nodeEntry) external;
+
+    /**
+     * @notice Reveal node
+     */
     function reveal() external;
+
+    /**
+     * @notice Get revealed state
+     * @return Revealed state
+     */
     function isRevealed() external view returns (uint256);
+
+    /**
+     * @notice Get node by nodeId
+     * @param tokenId Node Id.
+     * @return Node information.
+     */
     function nodeInfo(uint256 tokenId) external view returns (Node memory);
+
+    /**
+     * @notice Get count of existing nodes.
+     * @return count existing node count.
+     */
     function nodeCount() external view returns (uint256);
+
+    /**
+     * @notice Get node by nodeId
+     * @param index Index of node.
+     * @return Node information.
+     */
     function nodeByIndex(uint256 index) external view returns (Node memory);
+
+    /**
+     * @notice Get list of existing nodes.
+     * @return The list of existing node ids
+     */
     function nodeIds() external view returns (bytes32[] memory);
+
+    /**
+     * @notice Get count of nodes by owner address
+     * @param ownerAddr ESC address of owner.
+     * @return Node count.
+     */
     function ownedNodeCount(address ownerAddr) external view returns (uint256);
+
+    /**
+     * @notice Get count of nodes by owner address
+     * @param ownerAddr ESC address of owner.
+     * @param index Index of node.
+     * @return Node info.
+     */
     function ownedNodeByIndex(address ownerAddr, uint256 index) external view returns (Node memory);
+
+    /**
+     * @notice Get list of nodes by owner address
+     * @param ownerAddr ESC address of owner.
+     * @return nodeIds list of node Ids.
+     */
     function ownedNodeIds(address ownerAddr) external view returns (bytes32[] memory);
+
+    /**
+     * @notice Check validity of given nodeId.
+     * @param tokenId Node Id to check.
+     * @return The validity of nodeId
+     */
     function isValidNodeId(uint256 tokenId) external view returns (bool);
+
+    /**
+     * @notice Get last tokenId.
+     * @return The last nodeId
+     */
     function getLastTokenId() external view returns (uint256);
+
+    /**
+     * @notice Get node Id from node uri and node entry.
+     * @param nodeEntry Node Entry.
+     * @return The node Id
+     */
     function getTokenId(string memory nodeEntry) external view returns (uint256);
+
+    /**
+     * @dev Set platform fee config.
+     * @param platformAddr Address of platform
+     * @param platformFee Platform Fee
+     */
     function setPlatformFee(address platformAddr, uint256 platformFee) external;
+
+    /**
+     * @dev Get platform address config
+     * @return platformAddress address of platform
+     * @return platformFee platform fee
+     */
     function getPlatformFee() external view returns (address platformAddress, uint256 platformFee);
 }

@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity =0.7.6;
+pragma solidity ^0.7.0;
 
-import "../../common/ContextUpgradeable.sol";
-import "../../common/SafeMath.sol";
-import "../../common/Address.sol";
-import "../../common/Strings.sol";
-import "../../common/EnumerableSet.sol";
-import "../../common/EnumerableMap.sol";
-import "../ERC165/ERC165Upgradeable.sol";
-import "./IERC721.sol";
-import "./IERC721Metadata.sol";
-import "./IERC721Enumerable.sol";
-import "./IERC721Receiver.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/EnumerableMap.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/introspection/ERC165.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "../common/EnumerableSet.sol";
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
  * @dev see https://eips.ethereum.org/EIPS/eip-721
  */
-contract ERC721 is ContextUpgradeable, ERC165Upgradeable, IERC721, IERC721Metadata, IERC721Enumerable {
+contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable {
     using SafeMath for uint256;
     using Address for address;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -90,13 +90,7 @@ contract ERC721 is ContextUpgradeable, ERC165Upgradeable, IERC721, IERC721Metada
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    function __ERC721_init(string memory name_, string memory symbol_) internal initializer {
-        __Context_init_unchained();
-        __ERC165_init_unchained();
-        __ERC721_init_unchained(name_, symbol_);
-    }
-
-    function __ERC721_init_unchained(string memory name_, string memory symbol_) internal initializer {
+    constructor (string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
 
@@ -488,6 +482,4 @@ contract ERC721 is ContextUpgradeable, ERC165Upgradeable, IERC721, IERC721Metada
     function holderTokens(address owner) public view virtual returns (bytes32[] memory) {
         return _holderTokens[owner].get();
     }
-
-    uint256[41] private __gap;
 }
