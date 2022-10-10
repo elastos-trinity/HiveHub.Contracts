@@ -1,5 +1,5 @@
 const hre = require("hardhat");
-const { ethers, upgrades } = hre;
+const { ethers } = hre;
 const config = require("../hardhat.config");
 
 async function main() {
@@ -11,6 +11,10 @@ async function main() {
   );
 
   // ***************************  Node Registry  *************************** //
+  if (config.parameters.deployment.LastTokenId < 0) {
+    console.log("Last tokenId is incorrect.");
+    return ;
+  }
   if (!config.parameters.deployment.PlatformAddress) {
     console.log("Platform address is not set.");
     return ;
@@ -21,20 +25,13 @@ async function main() {
   }
   // deploy proxy contract
   const NodeRegistry = await ethers.getContractFactory("NodeRegistry");
-  let proxiedNodeRegisty;
-  if (config.parameters.deployment.WithProxy) {
-    proxiedNodeRegisty = await upgrades.deployProxy(NodeRegistry, [config.parameters.deployment.PlatformAddress, config.parameters.deployment.PlatformFee]);
-    await proxiedNodeRegisty.deployed();
-  }
-  else {
-    proxiedNodeRegisty = await upgrades.upgradeProxy(config.parameters.deployment.ContractAddress, NodeRegistry)
-  }
+  const nodeRegisty = await NodeRegistry.deploy(
+    config.parameters.deployment.LastTokenId, 
+    config.parameters.deployment.PlatformAddress, 
+    config.parameters.deployment.PlatformFee
+  );
 
-  // verify implementation contract
-  const nodeRegistryAddress = await upgrades.erc1967.getImplementationAddress(proxiedNodeRegisty.address);
-
-  console.log("Node Registry proxy contract deployed to:", proxiedNodeRegisty.address);
-  console.log("Node Registry logic contract deployed to:", nodeRegistryAddress);
+  console.log("Node Registry contract deployed to:", nodeRegisty.address);
 }
 
 main()
