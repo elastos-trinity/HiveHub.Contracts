@@ -1,11 +1,11 @@
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { parseEther } = require("ethers/lib/utils");
-const { ethers, upgrades } = require("hardhat");
+const { ethers } = require("hardhat");
 
 describe("NodeRegistry Contract", function () {
     let NodeRegistry, nodeRegistry, TESTERC20, testERC20, MockNR, mockNR;
-    let owner, addr1, addr2, addrs, platform, platformFee;
+    let owner, addr1, addr2, addrs, platform, platformFee, lastTokenId;
 
     before(async function () {
         NodeRegistry = await ethers.getContractFactory("NodeRegistry");
@@ -15,12 +15,13 @@ describe("NodeRegistry Contract", function () {
 
     beforeEach(async function () {
         [owner, addr1, addr2, platform, ...addrs] = await ethers.getSigners();
+        lastTokenId = 0;
         platformFee = parseEther('0.1');
         // deploy test erc20 token
         testERC20 = await TESTERC20.deploy();
         await testERC20.deployed();
         // deploy proxy contract
-        nodeRegistry = await upgrades.deployProxy(NodeRegistry, [platform.address, platformFee]);
+        nodeRegistry = await NodeRegistry.deploy(lastTokenId, platform.address, platformFee);
         await nodeRegistry.deployed();
     });
 
@@ -205,7 +206,7 @@ describe("NodeRegistry Contract", function () {
             // check input value for unregister
             await expect(nodeRegistry.connect(addr1).burn(BigNumber.from(7))).to.be.revertedWith("NodeRegistry: invalid nodeId");
             await expect(nodeRegistry.connect(owner).burn(BigNumber.from(7))).to.be.revertedWith("NodeRegistry: invalid nodeId");
-            await expect(nodeRegistry.connect(addr2).burn(node1.nodeId)).to.be.revertedWith("NodeRegistry: caller is not node owner or contract owner");
+            await expect(nodeRegistry.connect(addr2).burn(node1.nodeId)).to.be.revertedWith("NodeRegistry: caller is not node owner nor contract owner");
             // unregister with node owner
             await expect(nodeRegistry.connect(addr1).burn(node1.nodeId)).to.emit(nodeRegistry, "NodeUnregistered").withArgs(node1.nodeId);
             // unregister with owner
@@ -466,7 +467,7 @@ describe("NodeRegistry Contract", function () {
             expect(node_1.tokenURI).to.be.equal(node2.nodeUri);
             expect(node_1.nodeEntry).to.be.equal(node2.nodeEntry);
             // ********************************************************  Unregister  ******************************************************** //
-            await expect(nodeRegistry.connect(addr1).burn(node1.nodeId)).to.be.revertedWith("NodeRegistry: caller is not node owner or contract owner");
+            await expect(nodeRegistry.connect(addr1).burn(node1.nodeId)).to.be.revertedWith("NodeRegistry: caller is not node owner nor contract owner");
             // unregister with node owner
             await expect(nodeRegistry.connect(addr2).burn(node1.nodeId)).to.emit(nodeRegistry, "NodeUnregistered").withArgs(node1.nodeId);
         });
@@ -528,11 +529,11 @@ describe("NodeRegistry Contract", function () {
                 .to.emit(nodeRegistry, "NodeRegistered").withArgs(node3.nodeId, node3.nodeUri, node3.nodeEntry);
         });
 
-        it("Should be able to upgrade proxy contract", async function () {
+        it("Should be able to deploy new contract", async function () {
             const registerFee = platformFee;
             const node1 = { nodeId: BigNumber.from("1"), nodeUri: "first node uri", nodeEntry: "first node entry", fee: registerFee };
             const node2 = { nodeId: BigNumber.from("2"), nodeUri: "second node uri", nodeEntry: "second node entry", fee: registerFee };
-            const node3 = { nodeId: BigNumber.from("3"), nodeUri: "third node uri", nodeEntry: "third node entry", fee: registerFee };
+            const node3 = { nodeId: BigNumber.from("3"), nodeUri: "third node uri", nodeEntry: "third node entry", fee: registerFee.mul(2) };
 
             // check initial lastTokenId
             expect(await nodeRegistry.getLastTokenId()).to.be.equal(0);
@@ -545,19 +546,25 @@ describe("NodeRegistry Contract", function () {
                 .to.emit(nodeRegistry, "NodeRegistered").withArgs(node2.nodeId, node2.nodeUri, node2.nodeEntry);
             // check lastTokenId
             expect(await nodeRegistry.getLastTokenId()).to.be.equal(2);
+            await nodeRegistry.connect(owner).pause();
+
+            const newLastTokenId = await nodeRegistry.getLastTokenId();
+            const newPlatformAddress = platform.address;
+            const newPlatformFee = platformFee.mul(2);
             // upgrade contract
-            mockNR = await upgrades.upgradeProxy(nodeRegistry.address, MockNR);
-            console.log("Original proxy contract deployed to: ", nodeRegistry.address);
-            console.log("Upgraded proxy contract deployed to: ", mockNR.address);
-            expect(nodeRegistry.address).to.be.equal(mockNR.address);
+            mockNR = await MockNR.deploy(newLastTokenId, newPlatformAddress, newPlatformFee);
+            console.log("Original contract deployed to: ", nodeRegistry.address);
+            console.log("Upgraded contract deployed to: ", mockNR.address);
 
             // check lastTokenId
-            expect(await nodeRegistry.getLastTokenId()).to.be.equal(2);
+            expect(await nodeRegistry.getLastTokenId()).to.be.equal(await mockNR.getLastTokenId());
             // register 1 node
-            await expect(nodeRegistry.connect(owner).mint(node3.nodeUri, node3.nodeEntry, { value: node3.fee }))
-                .to.emit(nodeRegistry, "RegisteredFees").withArgs(node3.nodeId, platform.address, node3.fee)
-                .to.emit(nodeRegistry, "NodeRegistered").withArgs(node3.nodeId, node3.nodeUri, node3.nodeEntry);
-            expect(await nodeRegistry.getLastTokenId()).to.be.equal(3);
+            await expect(mockNR.connect(owner).mint(node3.nodeUri, node3.nodeEntry, { value: node3.fee }))
+                .to.emit(mockNR, "RegisteredFees").withArgs(node3.nodeId, platform.address, node3.fee)
+                .to.emit(mockNR, "NodeRegistered").withArgs(node3.nodeId, node3.nodeUri, node3.nodeEntry);
+            expect(await mockNR.getLastTokenId()).to.be.equal(3);
+            expect(await nodeRegistry.getLastTokenId()).to.be.equal(2);
+
 
             const updatedVersion = 2;
             expect(await mockNR.setVersion(updatedVersion)).to.emit(mockNR, "VersionUpdated").withArgs(updatedVersion);
