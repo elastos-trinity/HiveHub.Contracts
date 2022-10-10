@@ -277,7 +277,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, ERC721, Ownable, Reentrancy
     }
 
     /**
-     * @notice Get node Id from node uri and node entry.
+     * @notice Get node Id from node entry.
      * @param nodeEntry Node Entry.
      * @return The node Id
      */
@@ -303,7 +303,7 @@ contract NodeRegistry is INodeRegistryDataAndEvents, ERC721, Ownable, Reentrancy
     }
 
     /**
-     * @dev Set platform address config.
+     * @dev Set platform fee config.
      * @param platformAddr Address of platform
      * @param platformFee Platform Fee
      * @return success success or failed
@@ -332,11 +332,4 @@ contract NodeRegistry is INodeRegistryDataAndEvents, ERC721, Ownable, Reentrancy
     receive() external payable {}
 
     fallback() external payable {}
-
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[49] private __gap;
 }

@@ -175,7 +175,7 @@ interface INodeRegistry is IERC721, IPausable, INodeRegistryDataAndEvents {
     function getLastTokenId() external view returns (uint256);
 
     /**
-     * @notice Get node Id from node uri and node entry.
+     * @notice Get node Id from node entry.
      * @param nodeEntry Node Entry.
      * @return The node Id
      */
