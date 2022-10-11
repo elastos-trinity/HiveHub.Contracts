@@ -35,6 +35,8 @@ module.exports = {
     },
     script: {
       ContractAddress: '', // Deployed proxy contract address of the Node Registry Contract
+      PlatformAddress: '', 
+      PlatformFee: BigNumber.from('0'),
       testAddress1: '',
       testAddress2: '',
       testAddress3: '',
