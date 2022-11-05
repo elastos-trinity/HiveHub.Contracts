@@ -9,7 +9,7 @@ async function main() {
   for (const file of inputs) {
     const files = [file];
     const output = `./dist/${basename(file)}`;
-    await run("flatter", { files, output });
+    await hre.run("flatter", { files, output });
   }
 }
 
